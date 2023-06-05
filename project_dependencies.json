@@ -1,0 +1,15 @@
+{
+  "name": "SAE204-CODE-COUDIN",
+  "dependencies": {
+    "concurrently": {
+      "version": "8.0.1",
+      "resolved": "https://registry.npmjs.org/concurrently/-/concurrently-8.0.1.tgz",
+      "overridden": false
+    },
+    "nodemon": {
+      "version": "2.0.22",
+      "resolved": "https://registry.npmjs.org/nodemon/-/nodemon-2.0.22.tgz",
+      "overridden": false
+    }
+  }
+}
