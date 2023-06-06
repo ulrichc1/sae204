@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import '../components/geography.css'; // Import your CSS file
 
-mapboxgl.accessToken = 'pk.eyJ1IjoidWxyaWNoYzEiLCJhIjoiY2xoeG9lMmh6MHcwMTNncGdpMXhwNnFlZiJ9.5eIeootFPV-MbftkmnF0Gg';
+mapboxgl.accessToken = 'pk.eyJ1IjoidWxyaWNoYzEiLCJhIjoiY2xpa3JxcDR2MDF0bDNrcG5lZmU4NTViNiJ9.siwlD23fTQzrsf5ywF56CQ';
 
 
 const Geography = () => {
@@ -11,6 +11,7 @@ const Geography = () => {
     const [lng, setLng] = useState(2.3522);
     const [lat, setLat] = useState(48.8566);
     const [zoom, setZoom] = useState(12);
+
 
     useEffect(() => {
         if (!map.current) {
@@ -32,27 +33,31 @@ const Geography = () => {
         });
     });
 
-    useEffect(() => {
-        const fetchStationData = async () => {
-            try {
-                const response = await fetch('http://localhost:8800/station_information/paris');
-                const data = await response.json();
+    const fetchStationData = async () => {
+        try {
+            const response = await fetch('http://localhost:8800/station_information/paris');
+            const data = await response.json();
 
-                data.forEach((station) => {
-                    new mapboxgl.Marker()
-                        .setLngLat([station.lon, station.lat])
-                        .setPopup(
-                            new mapboxgl.Popup({ offset: 25 }).setHTML(
-                                `<h3>${station.station_id}</h3><p>${station.name}</p>`
-                            )
+            // Supprimer les marqueurs existants de la carte
+            const markers = map.current.getMarkers();
+            markers.forEach((marker) => marker.remove());
+
+            data.forEach((station) => {
+                new mapboxgl.Marker()
+                    .setLngLat([station.lon, station.lat])
+                    .setPopup(
+                        new mapboxgl.Popup({ offset: 25 }).setHTML(
+                            `<h3>${station.station_id}</h3><p>${station.name}</p></p>`
                         )
-                        .addTo(map.current);
-                });
-            } catch (error) {
-                console.error(error);
-            }
-        };
+                    )
+                    .addTo(map.current);
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
+    useEffect(() => {
         fetchStationData();
     }, []);
 

@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.json());
 
 // Fonction pour vider le cache
-function clearCache() {
+/* function clearCache() {
     cache.station_status = null;
     cache.last24Hours = null;
     cache.last48Hours = null;
@@ -21,7 +21,7 @@ function clearCache() {
 
 // Planification pour vider le cache toutes les 10 minutes
 setInterval(clearCache, 10 * 60 * 1000);
-
+*/
 
 app.get("/", (req, res) => {
     res.send("MySQL Server is running");
@@ -625,6 +625,282 @@ app.get("/station_status/count_mbikes", (req, res) => {
             } else {
                 // Cache the data
                 cache.count_mbikes = result;
+                res.send(result);
+            }
+        });
+    }
+});
+
+app.get("/station_status/bikes_count/realtime/:district_name", (req, res) => {
+    const districtName = req.params.district_name;
+    const cacheKey = `line_data_rt${districtName}`; // Unique cache key for electric bikes
+
+    // Check if the data is already cached
+    if (cache[cacheKey]) {
+        res.send(cache[cacheKey]);
+    } else {
+        const bikesQuery = "SELECT 'Electric bikes' AS id, SUM(available_electric_bikes) AS total_available_bikes, DATE_FORMAT(last_update, '%Y-%m-%d %H:%i:00') as x\n" +
+            "FROM station_status\n" +
+            "WHERE last_update >= NOW() - INTERVAL 9 MINUTE\n" +
+            "AND district_name = ?\n" +
+            "GROUP BY x\n" +
+            "UNION\n" +
+            "SELECT 'Mechanical bikes' AS id, SUM(available_mechanical_bikes) AS total_available_bikes, DATE_FORMAT(last_update, '%Y-%m-%d %H:%i:00') as x\n" +
+            "FROM station_status\n" +
+            "WHERE last_update >= NOW() - INTERVAL 9 MINUTE\n" +
+            "AND district_name = ?\n" +
+            "GROUP BY x\n" +
+            "ORDER BY x ASC;";
+        db.query(bikesQuery, [districtName,districtName], (err, result) => {
+            if (err) {
+                console.log(err);
+                res.status(500).send("Internal Server Error");
+            } else {
+                // Cache the data with the unique cache key
+                cache[cacheKey] = result;
+                res.send(result);
+            }
+        });
+    }
+});
+
+app.get("/station_status/bikes_count/last_day/:district_name", (req, res) => {
+    const districtName = req.params.district_name;
+    const cacheKey = `line_data_ld${districtName}`; // Unique cache key for electric bikes
+
+    // Check if the data is already cached
+    if (cache[cacheKey]) {
+        res.send(cache[cacheKey]);
+    } else {
+        const bikesQuery = "SELECT 'Electric bikes' AS id, SUM(available_electric_bikes) AS total_available_bikes, DATE_FORMAT(last_update, '%Y-%m-%d %H:%i:00') as x\n" +
+            "FROM station_status\n" +
+            "WHERE last_update >= NOW() - INTERVAL 1 DAY\n" +
+            "AND district_name = ?\n" +
+            "GROUP BY x\n" +
+            "UNION\n" +
+            "SELECT 'Mechanical bikes' AS id, SUM(available_mechanical_bikes) AS total_available_bikes, DATE_FORMAT(last_update, '%Y-%m-%d %H:%i:00') as x\n" +
+            "FROM station_status\n" +
+            "WHERE last_update >= NOW() - INTERVAL 1 DAY\n" +
+            "AND district_name = ?\n" +
+            "GROUP BY x\n" +
+            "ORDER BY x ASC;";
+        db.query(bikesQuery, [districtName,districtName], (err, result) => {
+            if (err) {
+                console.log(err);
+                res.status(500).send("Internal Server Error");
+            } else {
+                // Cache the data with the unique cache key
+                cache[cacheKey] = result;
+                res.send(result);
+            }
+        });
+    }
+});
+
+app.get("/station_status/bikes_count/last_48_hours/:district_name", (req, res) => {
+    const districtName = req.params.district_name;
+    const cacheKey = `line_data_2d${districtName}`; // Unique cache key for electric bikes
+
+    // Check if the data is already cached
+    if (cache[cacheKey]) {
+        res.send(cache[cacheKey]);
+    } else {
+        const bikesQuery = "SELECT 'Electric bikes' AS id, SUM(available_electric_bikes) AS total_available_bikes, DATE_FORMAT(last_update, '%Y-%m-%d %H:%i:00') as x\n" +
+            "FROM station_status\n" +
+            "WHERE last_update >= NOW() - INTERVAL 2 DAY\n" +
+            "AND district_name = ? \n" +
+            "GROUP BY x\n" +
+            "UNION\n" +
+            "SELECT 'Mechanical bikes' AS id, SUM(available_mechanical_bikes) AS total_available_bikes, DATE_FORMAT(last_update, '%Y-%m-%d %H:%i:00') as x\n" +
+            "FROM station_status\n" +
+            "WHERE last_update >= NOW() - INTERVAL 2 DAY\n" +
+            "AND district_name = ?\n" +
+            "GROUP BY x\n" +
+            "ORDER BY x ASC;";
+        db.query(bikesQuery, [districtName,districtName], (err, result) => {
+            if (err) {
+                console.log(err);
+                res.status(500).send("Internal Server Error");
+            } else {
+                // Cache the data with the unique cache key
+                cache[cacheKey] = result;
+                res.send(result);
+            }
+        });
+    }
+});
+
+app.get("/station_status/bikes_count/last_72_hours/:district_name", (req, res) => {
+    const districtName = req.params.district_name;
+    const cacheKey = `line_data_3d${districtName}`; // Unique cache key for electric bikes
+
+    // Check if the data is already cached
+    if (cache[cacheKey]) {
+        res.send(cache[cacheKey]);
+    } else {
+        const bikesQuery = "SELECT 'Electric bikes' AS id, SUM(available_electric_bikes) AS total_available_bikes, DATE_FORMAT(last_update, '%Y-%m-%d %H:%i:00') as x\n" +
+            "FROM station_status\n" +
+            "WHERE last_update >= NOW() - INTERVAL 3 DAY\n" +
+            "AND district_name = ?\n" +
+            "GROUP BY x\n" +
+            "UNION\n" +
+            "SELECT 'Mechanical bikes' AS id, SUM(available_mechanical_bikes) AS total_available_bikes, DATE_FORMAT(last_update, '%Y-%m-%d %H:%i:00') as x\n" +
+            "FROM station_status\n" +
+            "WHERE last_update >= NOW() - INTERVAL 3 DAY\n" +
+            "AND district_name = ?\n" +
+            "GROUP BY x\n" +
+            "ORDER BY x ASC;";
+        db.query(bikesQuery, [districtName,districtName], (err, result) => {
+            if (err) {
+                console.log(err);
+                res.status(500).send("Internal Server Error");
+            } else {
+                // Cache the data with the unique cache key
+                cache[cacheKey] = result;
+                res.send(result);
+            }
+        });
+    }
+});
+
+app.get("/station_status/bikes_count/last_week/:district_name", (req, res) => {
+    const districtName = req.params.district_name;
+    const cacheKey = `line_data_lw${districtName}`; // Unique cache key for electric bikes
+
+    // Check if the data is already cached
+    if (cache[cacheKey]) {
+        res.send(cache[cacheKey]);
+    } else {
+        const bikesQuery = "SELECT 'Electric bikes' AS id, SUM(available_electric_bikes) AS total_available_bikes, DATE_FORMAT(last_update, '%Y-%m-%d %H:%i:00') as x\n" +
+            "FROM station_status\n" +
+            "WHERE last_update >= NOW() - INTERVAL 1 WEEK\n" +
+            "AND district_name = ? \n" +
+            "GROUP BY x\n" +
+            "UNION\n" +
+            "SELECT 'Mechanical bikes' AS id, SUM(available_mechanical_bikes) AS total_available_bikes, DATE_FORMAT(last_update, '%Y-%m-%d %H:%i:00') as x\n" +
+            "FROM station_status\n" +
+            "WHERE last_update >= NOW() - INTERVAL 1 WEEK\n" +
+            "AND district_name = ? \n" +
+            "GROUP BY x\n" +
+            "ORDER BY x ASC;";
+        db.query(bikesQuery, [districtName,districtName], (err, result) => {
+            if (err) {
+                console.log(err);
+                res.status(500).send("Internal Server Error");
+            } else {
+                // Cache the data with the unique cache key
+                cache[cacheKey] = result;
+                res.send(result);
+            }
+        });
+    }
+});
+
+app.get("/station_status/districts/realtime/:district_name", (req, res) => {
+    const districtName = req.params.district_name;
+    const cacheKey = `bar_data_rt${districtName}`; // Unique cache key for electric bikes
+
+    // Check if the data is already cached
+    if (cache[cacheKey]) {
+        res.send(cache[cacheKey]);
+    } else {
+        const bikesQuery = "SELECT SUM(available_electric_bikes) AS available_electric_bikes, SUM(available_mechanical_bikes) AS available_mechanical_bikes,district_name FROM station_status WHERE last_update >= NOW() - INTERVAL 9 MINUTE AND district_name = ? GROUP BY district_name";
+        db.query(bikesQuery, [districtName], (err, result) => {
+            if (err) {
+                console.log(err);
+                res.status(500).send("Internal Server Error");
+            } else {
+                // Cache the data with the unique cache key
+                cache[cacheKey] = result;
+                res.send(result);
+            }
+        });
+    }
+});
+
+
+app.get("/station_status/districts/realtime/:district_name", (req, res) => {
+    const districtName = req.params.district_name;
+    const cacheKey = `bar_data_rt${districtName}`; // Unique cache key for electric bikes
+
+    // Check if the data is already cached
+    if (cache[cacheKey]) {
+        res.send(cache[cacheKey]);
+    } else {
+        const bikesQuery = "SELECT SUM(available_electric_bikes) AS available_electric_bikes, SUM(available_mechanical_bikes) AS available_mechanical_bikes,district_name FROM station_status WHERE last_update >= NOW() - INTERVAL 1 DAY AND district_name = ? GROUP BY district_name";
+        db.query(bikesQuery, [districtName], (err, result) => {
+            if (err) {
+                console.log(err);
+                res.status(500).send("Internal Server Error");
+            } else {
+                // Cache the data with the unique cache key
+                cache[cacheKey] = result;
+                res.send(result);
+            }
+        });
+    }
+});
+
+app.get("/station_status/districts/last_48_hours/:district_name", (req, res) => {
+    const districtName = req.params.district_name;
+    const cacheKey = `bar_data_rt${districtName}`; // Unique cache key for electric bikes
+
+    // Check if the data is already cached
+    if (cache[cacheKey]) {
+        res.send(cache[cacheKey]);
+    } else {
+        const bikesQuery = "SELECT SUM(available_electric_bikes) AS available_electric_bikes, SUM(available_mechanical_bikes) AS available_mechanical_bikes,district_name FROM station_status WHERE last_update >= NOW() - INTERVAL 2 DAY AND district_name = ? GROUP BY district_name";
+        db.query(bikesQuery, [districtName], (err, result) => {
+            if (err) {
+                console.log(err);
+                res.status(500).send("Internal Server Error");
+            } else {
+                // Cache the data with the unique cache key
+                cache[cacheKey] = result;
+                res.send(result);
+            }
+        });
+    }
+});
+
+app.get("/station_status/districts/last_72_hours/:district_name", (req, res) => {
+    const districtName = req.params.district_name;
+    const cacheKey = `bar_data_rt${districtName}`; // Unique cache key for electric bikes
+
+    // Check if the data is already cached
+    if (cache[cacheKey]) {
+        res.send(cache[cacheKey]);
+    } else {
+        const bikesQuery = "SELECT SUM(available_electric_bikes) AS available_electric_bikes, SUM(available_mechanical_bikes) AS available_mechanical_bikes,district_name FROM station_status WHERE last_update >= NOW() - INTERVAL 3 DAY AND district_name = ? GROUP BY district_name";
+        db.query(bikesQuery, [districtName], (err, result) => {
+            if (err) {
+                console.log(err);
+                res.status(500).send("Internal Server Error");
+            } else {
+                // Cache the data with the unique cache key
+                cache[cacheKey] = result;
+                res.send(result);
+            }
+        });
+    }
+});
+
+app.get("/station_status/districts/last_week/:district_name", (req, res) => {
+    const districtName = req.params.district_name;
+    const cacheKey = `bar_data_rt${districtName}`; // Unique cache key for electric bikes
+
+    // Check if the data is already cached
+    if (cache[cacheKey]) {
+        res.send(cache[cacheKey]);
+    } else {
+        const bikesQuery = "SELECT SUM(available_electric_bikes) AS available_electric_bikes, SUM(available_mechanical_bikes) AS available_mechanical_bikes,district_name FROM station_status WHERE last_update >= NOW() - INTERVAL 7 DAY AND district_name = ? GROUP BY district_name";
+        db.query(bikesQuery, [districtName], (err, result) => {
+            if (err) {
+                console.log(err);
+                res.status(500).send("Internal Server Error");
+            } else {
+                // Cache the data with the unique cache key
+                cache[cacheKey] = result;
                 res.send(result);
             }
         });

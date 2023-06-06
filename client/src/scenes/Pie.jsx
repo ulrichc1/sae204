@@ -13,6 +13,7 @@ const Pie = () => {
     const [isGeneratingChart, setIsGeneratingChart] = useState(false);
     const [selectedTimePeriod, setSelectedTimePeriod] = useState('');
 
+
     const addTwoHours = (dateString) => {
         const [date, time] = dateString.split("T"); // Split into date and time components
         const [hour, rest] = time.split(":"); // Split the time into hour and the rest of the time components

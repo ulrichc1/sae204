@@ -56,6 +56,7 @@ while True:
             # On met à jour les données dynamiques dans la base de données
             update_data(data_dynamique)
             print("Mise à jour des données dynamiques effectuée à :", now.strftime("%Y-%m-%d %H:%M:%S"))
-            time.sleep(600) # On attend 10 minutes avant de mettre à jour les données
     except Exception as e:
         print("Erreur :", e) # On affiche l'erreur
+    time.sleep(600)  # On attend 10 minutes avant de mettre à jour les données
+
